@@ -1,4 +1,5 @@
 import express from 'express';
+import path from 'path';
 import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
@@ -117,11 +118,11 @@ app.get('/health', (req, res) => {
 });
 
 // Serve static files
-app.use(express.static('public'));
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Mobile app route
 app.get('/mobile', (req, res) => {
-  res.sendFile('mobile-app.html', { root: 'public' });
+  res.sendFile(path.join(__dirname, 'public', 'mobile-app.html'));
 });
 
 // Root route
