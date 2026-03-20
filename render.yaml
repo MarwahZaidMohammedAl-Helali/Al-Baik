@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: wholesale-ecommerce-backend
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: MONGODB_URI
+        fromDatabase:
+          name: wholesale-ecommerce-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+    healthCheckPath: /api/health
+
+databases:
+  - name: wholesale-ecommerce-db
+    databaseName: wholesale_ecommerce
+    user: admin
+    plan: free
