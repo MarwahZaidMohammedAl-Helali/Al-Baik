@@ -15,6 +15,8 @@ import '../../features/checkout/presentation/pages/checkout_page.dart';
 import '../../features/checkout/presentation/pages/order_confirmation_page.dart';
 import '../../features/admin/presentation/pages/admin_dashboard_page.dart';
 import '../../features/admin/presentation/pages/admin_product_management_page.dart';
+import '../../features/admin/presentation/pages/add_product_page.dart';
+import '../../features/admin/presentation/pages/add_category_page.dart';
 import '../../features/admin/presentation/pages/admin_user_management_page.dart';
 import '../../features/admin/presentation/pages/admin_inventory_management_page.dart';
 import '../../features/employee/presentation/pages/employee_dashboard_page.dart';
@@ -148,6 +150,18 @@ class AppRouter {
                 path: '/products',
                 name: 'admin-products',
                 builder: (context, state) => const AdminProductManagementPage(),
+                routes: [
+                  GoRoute(
+                    path: '/add',
+                    name: 'admin-add-product',
+                    builder: (context, state) => const AddProductPage(),
+                  ),
+                ],
+              ),
+              GoRoute(
+                path: '/categories',
+                name: 'admin-categories',
+                builder: (context, state) => const AddCategoryPage(),
               ),
               GoRoute(
                 path: '/users',

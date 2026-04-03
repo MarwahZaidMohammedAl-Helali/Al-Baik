@@ -6,11 +6,13 @@ import '../../domain/entities/product.dart';
 class ProductCard extends StatelessWidget {
   final Product product;
   final VoidCallback onTap;
+  final bool isOffline;
 
   const ProductCard({
     super.key,
     required this.product,
     required this.onTap,
+    this.isOffline = false,
   });
 
   @override

@@ -78,6 +78,9 @@ A comprehensive e-commerce mobile application for a wholesale mobile accessories
 3. THE System SHALL support shopping cart functionality with add, remove, and quantity updates
 4. WHEN customers checkout, THE System SHALL process payments securely
 5. THE System SHALL provide user-friendly navigation similar to popular e-commerce apps
+6. THE System SHALL display "Al-Baik" branding consistently throughout the application
+7. WHEN customers view product videos, THE System SHALL play videos smoothly without errors
+8. THE System SHALL match the visual design and layout shown in the reference app photo
 
 ### Requirement 6: Backend API Services
 

@@ -134,6 +134,16 @@ class AdminDashboardPage extends StatelessWidget {
             const SizedBox(height: 12),
             
             _ManagementCard(
+              title: 'Category Management',
+              subtitle: 'Add and manage product categories',
+              icon: Icons.category,
+              color: Colors.deepOrange,
+              onTap: () => context.push('/admin/categories'),
+            ),
+            
+            const SizedBox(height: 12),
+            
+            _ManagementCard(
               title: 'User Management',
               subtitle: 'Manage customers and employees',
               icon: Icons.people_alt,

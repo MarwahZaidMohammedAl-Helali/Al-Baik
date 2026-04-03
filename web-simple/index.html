@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Al-Baik - متجر الكهربائيات</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#D32F2F'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Noto Sans Arabic', Arial, sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <header class="bg-white shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <h1 class="text-2xl font-bold text-primary">Al-Baik</h1>
+                </div>
+                
+                <div class="flex-1 max-w-lg mx-8">
+                    <input
+                        type="text"
+                        id="searchInput"
+                        placeholder="ابحث عن المنتجات..."
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                    />
+                </div>
+
+                <div class="flex items-center space-x-4 space-x-reverse">
+                    <button id="loginBtn" class="text-gray-600 hover:text-primary">
+                        تسجيل الدخول
+                    </button>
+                    <button id="adminBtn" class="bg-primary text-white px-4 py-2 rounded-lg hover:bg-red-700 hidden">
+                        لوحة التحكم
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="bg-primary text-white py-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h1 class="text-4xl font-bold mb-4">مرحباً بكم في Al-Baik</h1>
+            <p class="text-xl mb-8">أفضل الأجهزة الكهربائية والمنزلية بأسعار منافسة</p>
+        </div>
+    </section>
+
+    <!-- Categories -->
+    <section class="py-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-3xl font-bold text-center mb-12">الأقسام</h2>
+            <div id="categoriesContainer" class="grid grid-cols-2 md:grid-cols-4 gap-6">
+                <!-- Categories will be loaded here -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Products -->
+    <section class="py-16 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-3xl font-bold text-center mb-12">المنتجات المميزة</h2>
+            <div id="productsContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Products will be loaded here -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-8 max-w-md w-full mx-4">
+            <h3 class="text-2xl font-bold mb-6 text-center">تسجيل الدخول</h3>
+            <form id="loginForm">
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">البريد الإلكتروني</label>
+                    <input type="email" id="email" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                </div>
+                <div class="mb-6">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">كلمة المرور</label>
+                    <input type="password" id="password" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                </div>
+                <div class="flex items-center justify-between">
+                    <button type="submit" class="bg-primary text-white px-6 py-2 rounded-lg hover:bg-red-700">
+                        دخول
+                    </button>
+                    <button type="button" id="closeModal" class="text-gray-600 hover:text-gray-800">
+                        إلغاء
+                    </button>
+                </div>
+            </form>
+            <div class="mt-4 text-sm text-gray-600">
+                <p><strong>حسابات تجريبية:</strong></p>
+                <p>المدير: admin@al-baik.com / admin123</p>
+                <p>الموظف: staff@al-baik.com / staff123</p>
+                <p>العميل: customer@al-baik.com / customer123</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Panel -->
+    <div id="adminPanel" class="fixed inset-0 bg-white hidden z-50 overflow-y-auto">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="flex justify-between items-center mb-8">
+                <h1 class="text-3xl font-bold">لوحة التحكم - إدارة المنتجات</h1>
+                <button id="closeAdmin" class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600">
+                    إغلاق
+                </button>
+            </div>
+            
+            <!-- Add Product Form -->
+            <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+                <h2 class="text-xl font-bold mb-4">إضافة منتج جديد</h2>
+                <form id="addProductForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <input type="text" id="productName" placeholder="اسم المنتج (English)" required class="px-3 py-2 border border-gray-300 rounded-lg">
+                    <input type="text" id="productNameAr" placeholder="اسم المنتج (العربية)" required class="px-3 py-2 border border-gray-300 rounded-lg">
+                    <input type="number" id="productPrice" placeholder="السعر" step="0.01" required class="px-3 py-2 border border-gray-300 rounded-lg">
+                    <input type="number" id="productStock" placeholder="الكمية المتوفرة" required class="px-3 py-2 border border-gray-300 rounded-lg">
+                    <textarea id="productDescription" placeholder="الوصف" class="px-3 py-2 border border-gray-300 rounded-lg md:col-span-2"></textarea>
+                    <button type="submit" class="bg-primary text-white px-6 py-2 rounded-lg hover:bg-red-700 md:col-span-2">
+                        إضافة المنتج
+                    </button>
+                </form>
+            </div>
+
+            <!-- Products List -->
+            <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h2 class="text-xl font-bold">قائمة المنتجات</h2>
+                </div>
+                <div id="adminProductsList" class="divide-y divide-gray-200">
+                    <!-- Admin products will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'https://al-baik-api.albaik-ecommerce-api.workers.dev/api';
+        let currentUser = null;
+        let authToken = null;
+
+        // Load data on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadCategories();
+            loadProducts();
+            
+            // Check if user is logged in
+            authToken = localStorage.getItem('authToken');
+            if (authToken) {
+                getCurrentUser();
+            }
+        });
+
+        // API Functions
+        async function apiCall(endpoint, options = {}) {
+            const headers = {
+                'Content-Type': 'application/json',
+                ...options.headers
+            };
+            
+            if (authToken) {
+                headers['Authorization'] = `Bearer ${authToken}`;
+            }
+
+            const response = await fetch(`${API_BASE}${endpoint}`, {
+                ...options,
+                headers
+            });
+
+            if (!response.ok) {
+                throw new Error(`API Error: ${response.status}`);
+            }
+
+            return response.json();
+        }
+
+        async function getCurrentUser() {
+            try {
+                const data = await apiCall('/auth/me');
+                currentUser = data.user;
+                updateUI();
+            } catch (error) {
+                localStorage.removeItem('authToken');
+                authToken = null;
+            }
+        }
+
+        async function loadCategories() {
+            try {
+                const data = await apiCall('/categories');
+                displayCategories(data.categories);
+            } catch (error) {
+                console.error('Error loading categories:', error);
+            }
+        }
+
+        async function loadProducts() {
+            try {
+                const data = await apiCall('/products');
+                displayProducts(data.products);
+            } catch (error) {
+                console.error('Error loading products:', error);
+            }
+        }
+
+        function displayCategories(categories) {
+            const container = document.getElementById('categoriesContainer');
+            container.innerHTML = categories.map(category => `
+                <div class="bg-white rounded-lg p-6 text-center shadow-md hover:shadow-lg transition-shadow cursor-pointer">
+                    <div class="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center text-white text-2xl" 
+                         style="background-color: ${category.color}">
+                        ${category.icon || '📱'}
+                    </div>
+                    <h3 class="font-semibold">${category.nameAr}</h3>
+                </div>
+            `).join('');
+        }
+
+        function displayProducts(products) {
+            const container = document.getElementById('productsContainer');
+            container.innerHTML = products.map(product => `
+                <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+                    <div class="aspect-square bg-gray-100 relative">
+                        <img src="${product.mainImage}" alt="${product.nameAr}" 
+                             class="w-full h-full object-cover" 
+                             onerror="this.src='https://via.placeholder.com/400x400/D32F2F/FFFFFF?text=${encodeURIComponent(product.nameAr)}'">
+                        ${product.videoUrl ? '<div class="absolute top-2 right-2 bg-black bg-opacity-50 rounded-full p-1"><span class="text-white text-xs">🎥</span></div>' : ''}
+                    </div>
+                    
+                    <div class="p-4">
+                        <h3 class="font-semibold text-gray-900 mb-2">${product.nameAr}</h3>
+                        
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-lg font-bold text-primary">${product.price} ${product.currency}</span>
+                            <div class="flex items-center">
+                                <span class="text-yellow-400">★</span>
+                                <span class="text-sm text-gray-600 mr-1">${product.rating} (${product.reviewCount})</span>
+                            </div>
+                        </div>
+                        
+                        <button class="w-full py-2 px-4 rounded-lg font-semibold transition-colors ${
+                            product.inStock 
+                                ? 'bg-primary text-white hover:bg-red-700' 
+                                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                        }" ${!product.inStock ? 'disabled' : ''}>
+                            ${product.inStock ? 'إضافة للسلة' : 'غير متوفر'}
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function updateUI() {
+            const loginBtn = document.getElementById('loginBtn');
+            const adminBtn = document.getElementById('adminBtn');
+            
+            if (currentUser) {
+                loginBtn.textContent = `مرحباً، ${currentUser.firstName}`;
+                loginBtn.onclick = logout;
+                
+                if (currentUser.role === 'admin') {
+                    adminBtn.classList.remove('hidden');
+                }
+            } else {
+                loginBtn.textContent = 'تسجيل الدخول';
+                loginBtn.onclick = () => document.getElementById('loginModal').classList.remove('hidden');
+                adminBtn.classList.add('hidden');
+            }
+        }
+
+        async function login(email, password) {
+            try {
+                const data = await apiCall('/auth/login', {
+                    method: 'POST',
+                    body: JSON.stringify({ email, password })
+                });
+                
+                authToken = data.token;
+                currentUser = data.user;
+                localStorage.setItem('authToken', authToken);
+                
+                document.getElementById('loginModal').classList.add('hidden');
+                updateUI();
+                
+                alert('تم تسجيل الدخول بنجاح!');
+            } catch (error) {
+                alert('خطأ في تسجيل الدخول. تحقق من البيانات.');
+            }
+        }
+
+        function logout() {
+            authToken = null;
+            currentUser = null;
+            localStorage.removeItem('authToken');
+            updateUI();
+            document.getElementById('adminPanel').classList.add('hidden');
+            alert('تم تسجيل الخروج بنجاح!');
+        }
+
+        async function addProduct(productData) {
+            try {
+                await apiCall('/products', {
+                    method: 'POST',
+                    body: JSON.stringify(productData)
+                });
+                
+                alert('تم إضافة المنتج بنجاح!');
+                loadProducts();
+                loadAdminProducts();
+                document.getElementById('addProductForm').reset();
+            } catch (error) {
+                alert('خطأ في إضافة المنتج.');
+            }
+        }
+
+        async function loadAdminProducts() {
+            try {
+                const data = await apiCall('/products');
+                displayAdminProducts(data.products);
+            } catch (error) {
+                console.error('Error loading admin products:', error);
+            }
+        }
+
+        function displayAdminProducts(products) {
+            const container = document.getElementById('adminProductsList');
+            container.innerHTML = products.map(product => `
+                <div class="px-6 py-4 flex items-center justify-between">
+                    <div class="flex items-center">
+                        <img src="${product.mainImage}" alt="${product.nameAr}" 
+                             class="w-12 h-12 rounded-lg object-cover mr-4"
+                             onerror="this.src='https://via.placeholder.com/48x48/D32F2F/FFFFFF?text=📦'">
+                        <div>
+                            <div class="font-medium">${product.nameAr}</div>
+                            <div class="text-sm text-gray-500">${product.price} ${product.currency}</div>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-2 space-x-reverse">
+                        <span class="px-2 py-1 text-xs font-semibold rounded-full ${
+                            product.inStock ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                        }">
+                            ${product.inStock ? 'متوفر' : 'غير متوفر'}
+                        </span>
+                        <button onclick="deleteProduct('${product.id}')" 
+                                class="text-red-600 hover:text-red-900 px-2 py-1">
+                            حذف
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function deleteProduct(id) {
+            if (!confirm('هل أنت متأكد من حذف هذا المنتج؟')) return;
+            
+            try {
+                await apiCall(`/products/${id}`, { method: 'DELETE' });
+                alert('تم حذف المنتج بنجاح!');
+                loadProducts();
+                loadAdminProducts();
+            } catch (error) {
+                alert('خطأ في حذف المنتج.');
+            }
+        }
+
+        // Event Listeners
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            login(email, password);
+        });
+
+        document.getElementById('closeModal').addEventListener('click', function() {
+            document.getElementById('loginModal').classList.add('hidden');
+        });
+
+        document.getElementById('adminBtn').addEventListener('click', function() {
+            document.getElementById('adminPanel').classList.remove('hidden');
+            loadAdminProducts();
+        });
+
+        document.getElementById('closeAdmin').addEventListener('click', function() {
+            document.getElementById('adminPanel').classList.add('hidden');
+        });
+
+        document.getElementById('addProductForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const productData = {
+                name: document.getElementById('productName').value,
+                nameAr: document.getElementById('productNameAr').value,
+                description: document.getElementById('productDescription').value,
+                descriptionAr: document.getElementById('productDescription').value,
+                price: parseFloat(document.getElementById('productPrice').value),
+                currency: 'د.أ',
+                categoryId: 'electronics',
+                mainImage: 'https://via.placeholder.com/400x400/D32F2F/FFFFFF?text=' + encodeURIComponent(document.getElementById('productNameAr').value),
+                images: [],
+                inStock: true,
+                stockQuantity: parseInt(document.getElementById('productStock').value),
+                rating: 4.5,
+                reviewCount: 0,
+                salesCount: 0
+            };
+            
+            addProduct(productData);
+        });
+
+        // Search functionality
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            const searchTerm = e.target.value;
+            if (searchTerm.length > 2) {
+                searchProducts(searchTerm);
+            } else if (searchTerm.length === 0) {
+                loadProducts();
+            }
+        });
+
+        async function searchProducts(searchTerm) {
+            try {
+                const data = await apiCall(`/products?search=${encodeURIComponent(searchTerm)}`);
+                displayProducts(data.products);
+            } catch (error) {
+                console.error('Error searching products:', error);
+            }
+        }
+    </script>
+</body>
+</html>

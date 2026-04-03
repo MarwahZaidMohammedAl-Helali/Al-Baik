@@ -1,51 +1,19 @@
-name: wholesale_ecommerce_app
-description: A wholesale e-commerce mobile application built with Flutter and BLoC architecture.
+name: al_baik
+description: "Al-Baik Wholesale E-commerce App"
 publish_to: 'none'
 version: 1.0.0+1
 
 environment:
-  sdk: '>=3.0.0 <4.0.0'
-  flutter: ">=3.10.0"
+  sdk: '>=3.4.4 <4.0.0'
 
 dependencies:
   flutter:
     sdk: flutter
-  
-  # State Management
-  flutter_bloc: ^8.1.3
-  bloc: ^8.1.2
-  equatable: ^2.0.5
-  
-  # HTTP Client
-  http: ^1.1.0
-  dio: ^5.3.2
-  
-  # Local Storage
-  shared_preferences: ^2.2.2
-  hive: ^2.2.3
-  hive_flutter: ^1.1.0
-  
-  # Navigation
-  go_router: ^12.1.1
-  
-  # UI Components
   cupertino_icons: ^1.0.6
-  flutter_svg: ^2.0.7
-  cached_network_image: ^3.3.0
-  
-  # Utilities
-  intl: ^0.18.1
-  logger: ^2.0.2+1
-  connectivity_plus: ^5.0.1
-  dartz: ^0.10.1
-  get_it: ^7.6.4
-  uuid: ^4.1.0
-  
-  # Authentication
-  jwt_decoder: ^2.0.1
-  
-  # Form Validation
-  formz: ^0.6.1
+  video_player: ^2.8.1
+  path_provider: ^2.1.1
+  http: ^1.1.0
+  shared_preferences: ^2.2.2
 
 dev_dependencies:
   flutter_test:
@@ -56,14 +24,31 @@ flutter:
   uses-material-design: true
   
   assets:
-    - assets/images/
+    - assets/Product1/
+    - assets/Product1/Main Photo.png
+    - assets/Product1/Another photo.png
+    - assets/Product1/product1 Video.mp4
+    - assets/Product2/
+    - assets/Product2/Main Photo.png
+    - assets/Product2/Another photo 1.png
+    - assets/Product2/Another photo 2.png
+    - assets/Product2/product2 Video.mp4
+    - assets/Product3/
+    - assets/Product3/Main Photo.jpeg
+    - assets/Product3/Another photo.png
+    - assets/Product3/product3 Video.mp4
+    - assets/Product4/
+    - assets/Product4/Main Photo.jpeg
+    - assets/Product4/Another photo.jpg
+    - assets/Product4/product4 Video.mp4
+    - assets/Product5/
+    - assets/Product5/Main Photo.png
+    - assets/Product5/Another photo.png
+    - assets/Product5/product5 Video.mp4
+    - assets/Product6/
+    - assets/Product6/Main Photo.jpeg
+    - assets/Product6/product6 Video.mp4
     - assets/icons/
-  
-  fonts:
-    - family: Roboto
-      fonts:
-        - asset: assets/fonts/Roboto-Regular.ttf
-        - asset: assets/fonts/Roboto-Medium.ttf
-          weight: 500
-        - asset: assets/fonts/Roboto-Bold.ttf
-          weight: 700
+    - assets/fonts/
+    - assets/logo.png
+    - assets/App Photo.jpeg

@@ -26,8 +26,7 @@ class SearchProducts extends ProductsEvent {
   final String query;
   final String? category;
 
-  const SearchProducts({
-    required this.query,
+  const SearchProducts(this.query, {
     this.category,
   });
 

@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Al-Baik - متجر الكهربائيات الأول في الأردن</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#D32F2F',
+                        secondary: '#FF5722',
+                        accent: '#FFC107'
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-in-out',
+                        'slide-up': 'slideUp 0.6s ease-out',
+                        'bounce-in': 'bounceIn 0.8s ease-out'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@300;400;500;600;700;800&display=swap');
+        body { 
+            font-family: 'Noto Sans Arabic', Arial, sans-serif; 
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideUp {
+            from { transform: translateY(30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        @keyframes bounceIn {
+            0% { transform: scale(0.3); opacity: 0; }
+            50% { transform: scale(1.05); }
+            70% { transform: scale(0.9); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #D32F2F 0%, #FF5722 100%);
+        }
+        
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        
+        .product-card {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .product-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.1) 50%, transparent 70%);
+            transform: translateX(-100%);
+            transition: transform 0.6s;
+        }
+        
+        .product-card:hover::before {
+            transform: translateX(100%);
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Top Banner -->
+    <div class="bg-primary text-white text-center py-2 text-sm">
+        <div class="container mx-auto px-4">
+            🚚 شحن مجاني للطلبات أكثر من 100 دينار | 📞 خدمة العملاء: 06-123-4567
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="bg-white shadow-lg sticky top-0 z-50">
+        <div class="container mx-auto px-4">
+            <!-- Top Header -->
+            <div class="flex justify-between items-center py-3 border-b border-gray-100">
+                <div class="flex items-center space-x-6 space-x-reverse">
+                    <div class="text-sm text-gray-600">
+                        <i class="fas fa-map-marker-alt text-primary ml-1"></i>
+                        عمان، الأردن
+                    </div>
+                    <div class="text-sm text-gray-600">
+                        <i class="fas fa-phone text-primary ml-1"></i>
+                        06-123-4567
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4 space-x-reverse">
+                    <button id="loginBtn" class="text-gray-600 hover:text-primary transition-colors">
+                        <i class="fas fa-user ml-1"></i>
+                        تسجيل الدخول
+                    </button>
+                    <button id="adminBtn" class="bg-primary text-white px-3 py-1 rounded-full text-sm hover:bg-red-700 transition-colors hidden">
+                        <i class="fas fa-cog ml-1"></i>
+                        لوحة التحكم
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Main Header -->
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center">
+                    <div class="text-3xl font-bold text-primary">
+                        <i class="fas fa-bolt text-accent ml-2"></i>
+                        Al-Baik
+                    </div>
+                    <div class="text-sm text-gray-500 mr-2">متجر الكهربائيات الأول</div>
+                </div>
+                
+                <div class="flex-1 max-w-2xl mx-8">
+                    <div class="relative">
+                        <input
+                            type="text"
+                            id="searchInput"
+                            placeholder="ابحث عن المنتجات، الماركات، الأقسام..."
+                            class="w-full px-6 py-3 border-2 border-gray-200 rounded-full focus:border-primary focus:outline-none transition-colors text-right"
+                        />
+                        <button class="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-primary">
+                            <i class="fas fa-search text-lg"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="flex items-center space-x-6 space-x-reverse">
+                    <button class="relative text-gray-600 hover:text-primary transition-colors">
+                        <i class="fas fa-heart text-xl"></i>
+                        <span class="absolute -top-2 -right-2 bg-primary text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">0</span>
+                    </button>
+                    <button class="relative text-gray-600 hover:text-primary transition-colors">
+                        <i class="fas fa-shopping-cart text-xl"></i>
+                        <span id="cartCount" class="absolute -top-2 -right-2 bg-primary text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">0</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="bg-white border-t border-gray-200 shadow-sm">
+        <div class="container mx-auto px-4">
+            <div class="flex items-center justify-center space-x-8 space-x-reverse py-3">
+                <a href="#" class="text-gray-700 hover:text-primary font-medium transition-colors">الرئيسية</a>
+                <a href="#categories" class="text-gray-700 hover:text-primary font-medium transition-colors">الأقسام</a>
+                <a href="#products" class="text-gray-700 hover:text-primary font-medium transition-colors">المنتجات</a>
+                <a href="#" class="text-gray-700 hover:text-primary font-medium transition-colors">العروض</a>
+                <a href="#" class="text-gray-700 hover:text-primary font-medium transition-colors">الماركات</a>
+                <a href="#" class="text-gray-700 hover:text-primary font-medium transition-colors">خدمة العملاء</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="gradient-bg text-white py-20 relative overflow-hidden">
+        <div class="absolute inset-0 bg-black opacity-10"></div>
+        <div class="container mx-auto px-4 relative z-10">
+            <div class="text-center animate-fade-in">
+                <h1 class="text-5xl font-bold mb-6">مرحباً بكم في Al-Baik</h1>
+                <p class="text-xl mb-8 opacity-90">أفضل الأجهزة الكهربائية والمنزلية بأسعار لا تُقاوم</p>
+                <div class="flex justify-center space-x-4 space-x-reverse">
+                    <button class="bg-white text-primary px-8 py-4 rounded-full font-bold hover:bg-gray-100 transition-colors shadow-lg">
+                        <i class="fas fa-shopping-bag ml-2"></i>
+                        تسوق الآن
+                    </button>
+                    <button class="border-2 border-white text-white px-8 py-4 rounded-full font-bold hover:bg-white hover:text-primary transition-colors">
+                        <i class="fas fa-play ml-2"></i>
+                        شاهد الفيديو
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Floating Elements -->
+        <div class="absolute top-20 left-20 animate-bounce-in">
+            <i class="fas fa-bolt text-accent text-4xl opacity-20"></i>
+        </div>
+        <div class="absolute bottom-20 right-20 animate-bounce-in" style="animation-delay: 0.5s;">
+            <i class="fas fa-home text-accent text-3xl opacity-20"></i>
+        </div>
+    </section>
+
+    <!-- Features -->
+    <section class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div class="text-center animate-slide-up">
+                    <div class="w-16 h-16 bg-primary bg-opacity-10 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-shipping-fast text-primary text-2xl"></i>
+                    </div>
+                    <h3 class="font-bold mb-2">شحن سريع</h3>
+                    <p class="text-gray-600 text-sm">توصيل خلال 24 ساعة</p>
+                </div>
+                <div class="text-center animate-slide-up" style="animation-delay: 0.1s;">
+                    <div class="w-16 h-16 bg-primary bg-opacity-10 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-shield-alt text-primary text-2xl"></i>
+                    </div>
+                    <h3 class="font-bold mb-2">ضمان شامل</h3>
+                    <p class="text-gray-600 text-sm">ضمان لمدة سنتين</p>
+                </div>
+                <div class="text-center animate-slide-up" style="animation-delay: 0.2s;">
+                    <div class="w-16 h-16 bg-primary bg-opacity-10 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-headset text-primary text-2xl"></i>
+                    </div>
+                    <h3 class="font-bold mb-2">دعم 24/7</h3>
+                    <p class="text-gray-600 text-sm">خدمة عملاء متميزة</p>
+                </div>
+                <div class="text-center animate-slide-up" style="animation-delay: 0.3s;">
+                    <div class="w-16 h-16 bg-primary bg-opacity-10 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-undo text-primary text-2xl"></i>
+                    </div>
+                    <h3 class="font-bold mb-2">إرجاع مجاني</h3>
+                    <p class="text-gray-600 text-sm">خلال 14 يوم</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Categories -->
+    <section id="categories" class="py-20 bg-gray-50">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold mb-4">تسوق حسب القسم</h2>
+                <p class="text-gray-600 text-lg">اكتشف مجموعتنا الواسعة من الأجهزة الكهربائية</p>
+            </div>
+            <div id="categoriesContainer" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
+                <!-- Categories will be loaded here -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Top Products by Category -->
+    <div id="topProductsContainer">
+        <!-- Top products sections will be dynamically added here -->
+    </div>
+
+    <!-- All Products -->
+    <section id="products" class="py-20 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold mb-4">جميع المنتجات</h2>
+                <p class="text-gray-600 text-lg">اكتشف أحدث الأجهزة الكهربائية بأفضل الأسعار</p>
+            </div>
+            
+            <!-- Filter Tabs -->
+            <div class="flex justify-center mb-12">
+                <div class="bg-gray-100 rounded-full p-1">
+                    <button class="filter-tab active px-6 py-2 rounded-full transition-colors" data-filter="all">
+                        الكل
+                    </button>
+                    <button class="filter-tab px-6 py-2 rounded-full transition-colors" data-filter="electronics">
+                        كهربائيات
+                    </button>
+                    <button class="filter-tab px-6 py-2 rounded-full transition-colors" data-filter="new">
+                        جديد
+                    </button>
+                    <button class="filter-tab px-6 py-2 rounded-full transition-colors" data-filter="sale">
+                        عروض
+                    </button>
+                </div>
+            </div>
+            
+            <div id="productsContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+                <!-- Products will be loaded here -->
+            </div>
+            
+            <div class="text-center mt-12">
+                <button id="loadMoreBtn" class="bg-primary text-white px-8 py-3 rounded-full hover:bg-red-700 transition-colors">
+                    <i class="fas fa-plus ml-2"></i>
+                    عرض المزيد
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Newsletter -->
+    <section class="py-20 gradient-bg text-white">
+        <div class="container mx-auto px-4 text-center">
+            <h2 class="text-3xl font-bold mb-4">اشترك في النشرة الإخبارية</h2>
+            <p class="text-lg mb-8 opacity-90">احصل على أحدث العروض والمنتجات الجديدة</p>
+            <div class="max-w-md mx-auto flex">
+                <input type="email" placeholder="أدخل بريدك الإلكتروني" 
+                       class="flex-1 px-6 py-3 rounded-r-full text-gray-900 focus:outline-none">
+                <button class="bg-accent text-gray-900 px-8 py-3 rounded-l-full font-bold hover:bg-yellow-500 transition-colors">
+                    اشتراك
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-16">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <div class="text-2xl font-bold mb-4">
+                        <i class="fas fa-bolt text-accent ml-2"></i>
+                        Al-Baik
+                    </div>
+                    <p class="text-gray-400 mb-4">
+                        متجرك الموثوق للأجهزة الكهربائية والمنزلية عالية الجودة
+                    </p>
+                    <div class="flex space-x-4 space-x-reverse">
+                        <a href="#" class="text-gray-400 hover:text-accent transition-colors">
+                            <i class="fab fa-facebook text-xl"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-accent transition-colors">
+                            <i class="fab fa-instagram text-xl"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-accent transition-colors">
+                            <i class="fab fa-twitter text-xl"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-accent transition-colors">
+                            <i class="fab fa-youtube text-xl"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <div>
+                    <h4 class="font-bold mb-4">روابط سريعة</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#" class="hover:text-white transition-colors">المنتجات</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">الأقسام</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">العروض</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">من نحن</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="font-bold mb-4">خدمة العملاء</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#" class="hover:text-white transition-colors">الدعم الفني</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">الشحن والتوصيل</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">الإرجاع والاستبدال</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">الضمان</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="font-bold mb-4">تواصل معنا</h4>
+                    <div class="space-y-3 text-gray-400">
+                        <div class="flex items-center">
+                            <i class="fas fa-phone text-accent ml-3"></i>
+                            <span>+962 6 123 4567</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-envelope text-accent ml-3"></i>
+                            <span>info@al-baik.com</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-map-marker-alt text-accent ml-3"></i>
+                            <span>عمان، الأردن</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-800 mt-12 pt-8 text-center text-gray-400">
+                <p>&copy; 2024 Al-Baik. جميع الحقوق محفوظة.</p>
+            </div>
+        </div>
+    </footer>
+    <!-- Login Modal -->
+    <div id="loginModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-2xl p-8 max-w-md w-full mx-4 animate-bounce-in">
+            <div class="text-center mb-6">
+                <div class="w-16 h-16 bg-primary bg-opacity-10 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-user text-primary text-2xl"></i>
+                </div>
+                <h3 class="text-2x         <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+                    <h2 class="text-xl font-bold">
+                        <i class="fas fa-list text-primary ml-2"></i>
+                        قائمة المنتجات
+                    </h2>
+                </div>
+                <div id="adminProductsList" class="divide-y divide-gray-200">
+                    <!-- Admin products will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>cus:ring-2 focus:ring-primary focus:border-transparent md:col-span-2"></textarea>
+                    <button type="submit" class="bg-primary text-white px-6 py-3 rounded-lg hover:bg-red-700 transition-colors font-bold md:col-span-2">
+                        <i class="fas fa-plus ml-2"></i>
+                        إضافة المنتج
+                    </button>
+                </form>
+            </div>
+
+            <!-- Products List -->
+            <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+       r-transparent">
+                        <option value="">اختر القسم</option>
+                    </select>
+                    <div class="flex items-center">
+                        <input type="checkbox" id="isTopProduct" class="ml-2">
+                        <label for="isTopProduct" class="text-sm">إضافة لأفضل 10 منتجات</label>
+                    </div>
+                    <textarea id="productDescription" placeholder="الوصف" 
+                              class="px-4 py-3 border border-gray-300 rounded-lg fo-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                    <input type="number" id="productStock" placeholder="الكمية المتوفرة" required 
+                           class="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                    <select id="productCategory" required 
+                            class="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:borde                           class="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                    <input type="text" id="productNameAr" placeholder="اسم المنتج (العربية)" required 
+                           class="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                    <input type="number" id="productPrice" placeholder="السعر" step="0.01" required 
+                           class="px          </div>
+            </div>
+            
+            <!-- Add Product Form -->
+            <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+                <h2 class="text-xl font-bold mb-4">
+                    <i class="fas fa-plus text-primary ml-2"></i>
+                    إضافة منتج جديد
+                </h2>
+                <form id="addProductForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <input type="text" id="productName" placeholder="اسم المنتج (English)" required 
+>0</p>
+                        </div>
+                        <i class="fas fa-warehouse text-3xl text-purple-200"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Top Products Management -->
+            <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+                <h2 class="text-xl font-bold mb-4">إدارة أفضل 10 منتجات لكل قسم</h2>
+                <div id="topProductsManagement">
+                    <!-- Top products management will be loaded here -->
+                   </div>
+                        <i class="fas fa-exclamation-triangle text-3xl text-red-200"></i>
+                    </div>
+                </div>
+                <div class="bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-lg p-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-purple-100">إجمالي المخزون</p>
+                            <p id="totalInventory" class="text-3xl font-bold"          </div>
+                        <i class="fas fa-check-circle text-3xl text-green-200"></i>
+                    </div>
+                </div>
+                <div class="bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg p-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-red-100">غير متوفرة</p>
+                            <p id="outOfStockProducts" class="text-3xl font-bold">0</p>
+                      </div>
+                        <i class="fas fa-box text-3xl text-blue-200"></i>
+                    </div>
+                </div>
+                <div class="bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg p-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-green-100">المنتجات المتوفرة</p>
+                            <p id="inStockProducts" class="text-3xl font-bold">0</p>
+                    </button>
+            </div>
+            
+            <!-- Admin Stats -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                <div class="bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg p-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-blue-100">إجمالي المنتجات</p>
+                            <p id="totalProducts" class="text-3xl font-bold">0</p>
+                        <div class="flex justify-between items-center mb-8 bg-white shadow-lg rounded-lg p-6">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-900">لوحة التحكم</h1>
+                    <p class="text-gray-600">إدارة المنتجات والأقسام</p>
+                </div>
+                <button id="closeAdmin" class="bg-gray-500 text-white px-6 py-3 rounded-lg hover:bg-gray-600 transition-colors">
+                    <i class="fas fa-times ml-2"></i>
+                    إغلاق
+          ">
+                    <p><strong>المدير:</strong> admin@al-baik.com / admin123</p>
+                    <p><strong>الموظف:</strong> staff@al-baik.com / staff123</p>
+                    <p><strong>العميل:</strong> customer@al-baik.com / customer123</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Panel -->
+    <div id="adminPanel" class="fixed inset-0 bg-white hidden z-50 overflow-y-auto">
+        <div class="container mx-auto px-4 py-8">
+            <!-- Admin Header -->
+ ass="fas fa-sign-in-alt ml-2"></i>
+                        دخول
+                    </button>
+                    <button type="button" id="closeModal" class="text-gray-600 hover:text-gray-800 transition-colors">
+                        إلغاء
+                    </button>
+                </div>
+            </form>
+            
+            <div class="bg-gray-50 rounded-lg p-4 text-sm">
+                <p class="font-bold mb-2 text-center">حسابات تجريبية:</p>
+                <div class="space-y-1 text-gray-600l px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent pr-10">
+                        <i class="fas fa-lock absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                    </div>
+                </div>
+                <div class="flex items-center justify-between mb-6">
+                    <button type="submit" class="bg-primary text-white px-8 py-3 rounded-lg hover:bg-red-700 transition-colors font-bold">
+                        <i clg-2 focus:ring-primary focus:border-transparent pr-10">
+                        <i class="fas fa-envelope absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                    </div>
+                </div>
+                <div class="mb-6">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">كلمة المرور</label>
+                    <div class="relative">
+                        <input type="password" id="password" required 
+                               class="w-full font-bold">تسجيل الدخول</h3>
+                <p class="text-gray-600">أدخل بياناتك للوصول إلى حسابك</p>
+            </div>
+            
+            <form id="loginForm">
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">البريد الإلكتروني</label>
+                    <div class="relative">
+                        <input type="email" id="email" required 
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:rin
+    <script src="script.js"></script>
+</body>
+</html>

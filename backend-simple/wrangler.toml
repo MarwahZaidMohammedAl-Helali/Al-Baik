@@ -1,0 +1,12 @@
+name = "al-baik-api"
+main = "src/index.js"
+compatibility_date = "2023-12-01"
+
+[vars]
+JWT_SECRET = "your-super-secret-jwt-key-change-in-production"
+ENVIRONMENT = "production"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "al-baik-db"
+database_id = "f9519b7b-7cc1-4cde-8baa-16e57c94f61e"

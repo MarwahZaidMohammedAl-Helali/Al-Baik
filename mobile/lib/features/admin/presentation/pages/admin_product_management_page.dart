@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/di/injection_container.dart';
+import '../../../../services/api_service.dart';
 import '../../../products/presentation/bloc/products_bloc.dart';
 import '../../../products/presentation/bloc/products_event.dart';
 import '../../../products/presentation/bloc/products_state.dart';
@@ -248,15 +249,33 @@ class AdminProductManagementView extends StatelessWidget {
             child: const Text('Cancel'),
           ),
           ElevatedButton(
-            onPressed: () {
+            onPressed: () async {
               Navigator.of(context).pop();
-              // TODO: Implement delete product
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('${product.name} deleted successfully'),
-                  backgroundColor: Colors.green,
-                ),
-              );
+              
+              try {
+                final apiService = ApiService();
+                await apiService.deleteProduct(product.id);
+                
+                // Refresh products list
+                if (context.mounted) {
+                  context.read<ProductsBloc>().add(const LoadProducts());
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('${product.name} deleted successfully'),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
+                }
+              } catch (e) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Failed to delete product: $e'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
+              }
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.red,

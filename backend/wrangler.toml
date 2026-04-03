@@ -1,0 +1,26 @@
+name = "al-baik-api"
+main = "src/index.js"
+compatibility_date = "2023-12-01"
+
+[env.production.vars]
+ENVIRONMENT = "production"
+
+[env.development.vars]
+ENVIRONMENT = "development"
+
+# Turso Database Configuration
+[[env.production.d1_databases]]
+binding = "DB"
+database_name = "al-baik-prod"
+database_id = "your-turso-database-id"
+
+[[env.development.d1_databases]]
+binding = "DB"
+database_name = "al-baik-dev"
+database_id = "your-turso-dev-database-id"
+
+# R2 Storage Configuration
+[[r2_buckets]]
+binding = "R2"
+bucket_name = "al-baik-media"
+preview_bucket_name = "al-baik-media-preview"

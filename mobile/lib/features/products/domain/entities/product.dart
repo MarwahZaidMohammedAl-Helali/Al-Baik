@@ -5,6 +5,7 @@ class Product extends Equatable {
   final String name;
   final String description;
   final String category;
+  final String sku;
   final double price;
   final double? wholesalePrice;
   final int stockQuantity;
@@ -20,6 +21,7 @@ class Product extends Equatable {
     required this.name,
     required this.description,
     required this.category,
+    required this.sku,
     required this.price,
     this.wholesalePrice,
     required this.stockQuantity,
@@ -47,6 +49,7 @@ class Product extends Equatable {
         name,
         description,
         category,
+        sku,
         price,
         wholesalePrice,
         stockQuantity,
