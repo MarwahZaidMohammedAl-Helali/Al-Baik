@@ -37,7 +37,7 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen>
     with SingleTickerProviderStateMixin {
-  late AnimationController _animationController;
+  laionController;
   late Animation<double> _fadeAnimation;
   late Animation<double> _scaleAnimation;
 
@@ -159,7 +159,7 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
-  bool _isLoggedIn = false;
+  bo_isLoggedIn = false;
   String _userType = 'guest';
   String _userName = '';
 
@@ -172,7 +172,7 @@ class _MainScreenState extends State<MainScreen> {
         setState(() {
           _isLoggedIn = true;
           _userType = response['user']['role'] ?? 'customer';
-          _userName = '${response['user']['firstName']} ${response['user']['lastName']}';
+          _userName = '${response['user']['firstN';
         });
         Navigator.pop(context); // Close login page
       }
@@ -198,7 +198,7 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
+ ext) {
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
@@ -299,7 +299,7 @@ class _HomeScreenState extends State<HomeScreen> {
               child: SingleChildScrollView(
                 padding: const EdgeInsets.all(16),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAisAlignment.start,
                   children: [
                     // Search Bar
                     Container(
@@ -310,7 +310,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       child: const TextField(
                         textAlign: TextAlign.right,
-                        decoration: InputDecoration(
+                        putDecoration(
                           hintText: 'ابحث عن المنتجات...',
                           border: InputBorder.none,
                           icon: Icon(Icons.search),
@@ -344,7 +344,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             context,
                             category['nameAr'] ?? category['name'] ?? 'قسم',
                             category['icon'] ?? '📦',
-                            const Color(0xFFD32F2F),
+                        const Color(0xFFD32F2F),
                           );
                         },
                       ),
@@ -356,7 +356,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         width: double.infinity,
                         padding: const EdgeInsets.all(32),
                         decoration: BoxDecoration(
-                          color: Colors.grey[100],
+      rey[100],
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(color: Colors.grey[300]!),
                         ),
@@ -366,7 +366,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             SizedBox(height: 16),
                             Text(
                               'لا توجد أقسام',
-                              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.grey),
+                           e: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.grey),
                             ),
                             SizedBox(height: 8),
                             Text(
@@ -377,7 +377,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           ],
                         ),
                       ),
-                      const SizedBox(height: 30),
+ const SizedBox(height: 30),
                     ],
                     
                     // Products Section
@@ -399,7 +399,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         itemCount: products.length,
                         itemBuilder: (context, index) {
-                          final product = products[index];
+                          final prcts[index];
                           return _buildProduct(context, product);
                         },
                       ),
@@ -419,7 +419,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             SizedBox(height: 16),
                             Text(
                               'لا توجد منتجات',
-                              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.grey),
+                              style: TextStyle(fonors.grey),
                             ),
                             SizedBox(height: 8),
                             Text(
@@ -441,10 +441,11 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildCategory(BuildContext context, String name, String icon, Color color) {
     return GestureDetector(
       onTap: () {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('منتجات $name - قريباً'),
-            backgroundColor: Colors.grey[600],
+        // Navigate to category products
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => CategoryProductsScreen(categoryName: name),
           ),
         );
       },
@@ -453,7 +454,7 @@ class _HomeScreenState extends State<HomeScreen> {
           Container(
             width: 60,
             height: 60,
-            decoration: BoxDecoration(
+ : BoxDecoration(
               color: color.withOpacity(0.2),
               borderRadius: BorderRadius.circular(30),
             ),
@@ -470,7 +471,7 @@ class _HomeScreenState extends State<HomeScreen> {
             style: const TextStyle(fontSize: 10),
             textAlign: TextAlign.center,
             maxLines: 2,
-            overflow: TextOverflow.ellipsis,
+            overflow: rflow.ellipsis,
           ),
         ],
       ),
@@ -480,17 +481,18 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildProduct(BuildContext context, Map<String, dynamic> product) {
     return GestureDetector(
       onTap: () {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('تفاصيل ${product['nameAr'] ?? product['name']} - قريباً'),
-            backgroundColor: Colors.grey[600],
+        // Navigate to product details
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ProductDetailScreen(product: product),
           ),
         );
       },
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(10),
+          boorderRadius.circular(10),
           boxShadow: [
             BoxShadow(
               color: Colors.grey.withOpacity(0.3),
@@ -540,7 +542,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   const SizedBox(height: 5),
                   Text(
                     '${product['price'] ?? 0} ${product['currency'] ?? 'JOD'}',
-                    style: const TextStyle(color: Color(0xFFD32F2F), fontWeight: FontWeight.bold),
+            FontWeight.bold),
                   ),
                 ],
               ),
@@ -558,14 +560,9 @@ class ProductsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('المنتجات'),
-        backgroundColor: const Color(0xFFD32F2F),
-        foregroundColor: Colors.white,
-      ),
-      body: const Center(
-        child: Text('صفحة المنتجات - قريباً'),
+    return const Scaffold(
+      body: Center(
+        child: Text('Products Screen - Coming Soon'),
       ),
     );
   }
@@ -576,14 +573,9 @@ class CartScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('السلة'),
-        backgroundColor: const Color(0xFFD32F2F),
-        foregroundColor: Colors.white,
-      ),
-      body: const Center(
-        child: Text('صفحة السلة - قريباً'),
+    return const Scaffold(
+      body: Center(
+        child: Text('Cart Screen - Coming Soon'),
       ),
     );
   }
@@ -602,7 +594,7 @@ class AccountScreen extends StatelessWidget {
     required this.userType,
     required this.userName,
     required this.onLogin,
-    required this.onLogout,
+    requir.onLogout,
   });
 
   @override
@@ -624,10 +616,11 @@ class AccountScreen extends StatelessWidget {
                   if (userType == 'admin' || userType == 'staff')
                     ElevatedButton(
                       onPressed: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('لوحة التحكم - قريباً'),
-                            backgroundColor: Colors.grey,
+                        // Navigate to admin dashboard
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const AdminDashboardScreen(),
                           ),
                         );
                       },
@@ -642,15 +635,95 @@ class AccountScreen extends StatelessWidget {
               )
             : ElevatedButton(
                 onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('صفحة تسجيل الدخول - قريباً'),
-                      backgroundColor: Colors.grey,
+                  // Navigate to login screen
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => LoginScreen(onLogin: onLogin),
                     ),
                   );
                 },
                 child: const Text('تسجيل الدخول'),
               ),
+      ),
+    );
+  }
+}
+
+// Placeholder screens
+class CategoryProductsScreen extends StatelessWidget {
+  final String categoryName;
+
+  const CategoryProductsScreen({super.key, required this.categoryName});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(categoryName),
+        backgroundColor: const Color(0xFFD32F2F),
+        foregroundColor: Colors.white,
+      ),
+      body: const Center(
+        child: Text('Category Products - Coming Soon'),
+      ),
+    );
+  }
+}
+
+class ProductDetailScreen extends StatelessWidget {
+  final Map<String, dynamic> product;
+
+  const ProductDetailScreen({super.key, required this.product});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title:product['name'] ?? 'منتج'),
+        backgroundColor: const Color(0xFFD32F2F),
+        foregroundColor: Colors.white,
+      ),
+      body: const Center(
+        child: Text('Product Details - Coming Soon'),
+      ),
+    );
+  }
+}
+
+class LoginScreen extends StatelessWidget {
+  final Function(String, String) onLogin;
+
+  const LoginScreen({super.key, required this.onLogin});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('تسجيل الدخول'),
+        backgroundColor: const Color(0xFFD32F2F),
+        foregroundColor: Colors.white,
+      ),
+      body: const Center(
+        child: Text('Login Screen - Coming Soon'),
+      ),
+    );
+  }
+}
+
+class AdminDashboardScreen extends StatelessWidget {
+  const AdminDashboardScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('لوحة التحكم'),
+        backgroundColor: const Color(0xFFD32F2F),
+        foregroundColor: Colors.white,
+      ),
+      body: const Center(
+        child: Text('Admin Dashboard - Coming Soon'),
       ),
     );
   }
