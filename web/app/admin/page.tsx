@@ -162,7 +162,6 @@ export default function AdminPage() {
       
       setProducts(productsRes.data.products || [])
       setCategories(categoriesRes.data.categories || [])
-      setDemoMode(false) // Production API doesn't have demo mode
     } catch (error) {
       console.error('Error fetching data:', error)
     } finally {
@@ -660,7 +659,10 @@ export default function AdminPage() {
                         }}
                         onError={(e) => {
                           e.currentTarget.style.display = 'none'
-                          e.currentTarget.nextElementSibling.style.display = 'flex'
+                          const nextElement = e.currentTarget.nextElementSibling as HTMLElement
+                          if (nextElement) {
+                            nextElement.style.display = 'flex'
+                          }
                         }}
                       />
                     ) : null}

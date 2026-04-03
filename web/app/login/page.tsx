@@ -283,8 +283,14 @@ export default function LoginPage() {
               transition: 'background-color 0.2s',
               marginBottom: '1rem'
             }}
-            onMouseOver={(e) => e.target.style.backgroundColor = 'var(--primary-red-dark)'}
-            onMouseOut={(e) => e.target.style.backgroundColor = 'var(--primary-red)'}
+            onMouseOver={(e) => {
+              const target = e.target as HTMLElement
+              target.style.backgroundColor = 'var(--primary-red-dark)'
+            }}
+            onMouseOut={(e) => {
+              const target = e.target as HTMLElement
+              target.style.backgroundColor = 'var(--primary-red)'
+            }}
           >
             {isLogin ? 'تسجيل الدخول' : 'إنشاء الحساب'}
           </button>
