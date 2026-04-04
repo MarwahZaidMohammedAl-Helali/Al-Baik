@@ -1,25 +1,55 @@
-// Script to create admin account for testing
-const axios = require('axios');
+// Script to create admin user
+// Run this with: node create-admin.js
 
-const API_URL = 'https://al-baik-api.albaik-ecommerce-api.workers.dev/api';
+const API_BASE = 'https://al-baik-api.albaik-ecommerce-api.workers.dev/api';
 
-async function createAdmin() {
+async function createAndTestAdmin() {
   try {
-    const response = await axios.post(`${API_URL}/auth/register`, {
-      firstName: 'Admin',
-      lastName: 'User',
-      email: 'admin@albaik.com',
-      password: 'admin123',
-      role: 'admin'
-    });
+    console.log('🔄 Creating admin user...');
     
-    console.log('Admin account created successfully:');
-    console.log('Email: admin@albaik.com');
-    console.log('Password: admin123');
-    console.log('Token:', response.data.token);
+    const createResponse = await fetch(`${API_BASE}/admin/create-admin`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    });
+
+    const createData = await createResponse.json();
+    
+    if (createResponse.ok) {
+      console.log('✅ Admin user created successfully!');
+      console.log('📧 Email: admin');
+      console.log('🔑 Password: 1234');
+      
+      // Now test login
+      console.log('🔄 Testing admin login...');
+      
+      const loginResponse = await fetch(`${API_BASE}/auth/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: 'admin',
+          password: '1234'
+        })
+      });
+
+      const loginData = await loginResponse.json();
+      
+      if (loginResponse.ok) {
+        console.log('✅ Admin login successful!');
+        console.log('👤 Role:', loginData.user?.role);
+        console.log('🎯 Token:', loginData.token ? 'Generated' : 'Missing');
+      } else {
+        console.log('❌ Login failed:', loginData.error);
+      }
+    } else {
+      console.log('❌ Failed to create admin user:', createData.error);
+    }
   } catch (error) {
-    console.error('Error creating admin:', error.response?.data || error.message);
+    console.error('❌ Error:', error.message);
   }
 }
 
-createAdmin();
+createAndTestAdmin();

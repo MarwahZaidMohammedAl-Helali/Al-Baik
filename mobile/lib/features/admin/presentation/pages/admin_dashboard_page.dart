@@ -1,226 +1,315 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
+import '../../../../services/api_service.dart';
+import 'add_category_page.dart';
+import 'add_product_page.dart';
+import 'manage_categories_page.dart';
+import 'manage_products_page.dart';
 
-class AdminDashboardPage extends StatelessWidget {
+class AdminDashboardPage extends StatefulWidget {
   const AdminDashboardPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Admin Dashboard'),
-        backgroundColor: Theme.of(context).primaryColor,
-        foregroundColor: Colors.white,
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Welcome Section
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    Theme.of(context).primaryColor,
-                    Theme.of(context).primaryColor.withOpacity(0.8),
-                  ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Welcome, Admin',
-                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Manage your wholesale e-commerce platform',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Colors.white.withOpacity(0.9),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            
-            const SizedBox(height: 24),
-            
-            // Quick Stats
-            Text(
-              'Quick Overview',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            
-            const SizedBox(height: 16),
-            
-            Row(
-              children: [
-                Expanded(
-                  child: _StatCard(
-                    title: 'Total Products',
-                    value: '1,234',
-                    icon: Icons.inventory,
-                    color: Colors.blue,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: _StatCard(
-                    title: 'Active Users',
-                    value: '567',
-                    icon: Icons.people,
-                    color: Colors.green,
-                  ),
-                ),
-              ],
-            ),
-            
-            const SizedBox(height: 12),
-            
-            Row(
-              children: [
-                Expanded(
-                  child: _StatCard(
-                    title: 'Pending Orders',
-                    value: '89',
-                    icon: Icons.pending_actions,
-                    color: Colors.orange,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: _StatCard(
-                    title: 'Low Stock Items',
-                    value: '23',
-                    icon: Icons.warning,
-                    color: Colors.red,
-                  ),
-                ),
-              ],
-            ),
-            
-            const SizedBox(height: 24),
-            
-            // Management Sections
-            Text(
-              'Management',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            
-            const SizedBox(height: 16),
-            
-            _ManagementCard(
-              title: 'Product Management',
-              subtitle: 'Add, edit, and manage product catalog',
-              icon: Icons.inventory_2,
-              color: Colors.blue,
-              onTap: () => context.push('/admin/products'),
-            ),
-            
-            const SizedBox(height: 12),
-            
-            _ManagementCard(
-              title: 'Category Management',
-              subtitle: 'Add and manage product categories',
-              icon: Icons.category,
-              color: Colors.deepOrange,
-              onTap: () => context.push('/admin/categories'),
-            ),
-            
-            const SizedBox(height: 12),
-            
-            _ManagementCard(
-              title: 'User Management',
-              subtitle: 'Manage customers and employees',
-              icon: Icons.people_alt,
-              color: Colors.green,
-              onTap: () => context.push('/admin/users'),
-            ),
-            
-            const SizedBox(height: 12),
-            
-            _ManagementCard(
-              title: 'Inventory Management',
-              subtitle: 'Track stock levels and alerts',
-              icon: Icons.warehouse,
-              color: Colors.purple,
-              onTap: () => context.push('/admin/inventory'),
-            ),
-            
-            const SizedBox(height: 12),
-            
-            _ManagementCard(
-              title: 'Order Management',
-              subtitle: 'View and manage all orders',
-              icon: Icons.receipt_long,
-              color: Colors.orange,
-              onTap: () => context.push('/admin/orders'),
-            ),
-            
-            const SizedBox(height: 12),
-            
-            _ManagementCard(
-              title: 'Analytics & Reports',
-              subtitle: 'View sales and performance data',
-              icon: Icons.analytics,
-              color: Colors.indigo,
-              onTap: () => context.push('/admin/analytics'),
-            ),
-            
-            const SizedBox(height: 12),
-            
-            _ManagementCard(
-              title: 'System Status',
-              subtitle: 'Monitor system health and performance',
-              icon: Icons.monitor_heart,
-              color: Colors.teal,
-              onTap: () => context.push('/admin/system-status'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+  State<AdminDashboardPage> createState() => _AdminDashboardPageState();
 }
 
-class _StatCard extends StatelessWidget {
-  final String title;
-  final String value;
-  final IconData icon;
-  final Color color;
+class _AdminDashboardPageState extends State<AdminDashboardPage> {
+  Map<String, dynamic> stats = {};
+  bool isLoading = true;
 
-  const _StatCard({
-    required this.title,
-    required this.value,
-    required this.icon,
-    required this.color,
-  });
+  @override
+  void initState() {
+    super.initState();
+    _loadStats();
+  }
+
+  Future<void> _loadStats() async {
+    try {
+      final apiService = ApiService();
+      final [categoriesResponse, productsResponse] = await Future.wait([
+        apiService.getCategories(),
+        apiService.getProducts(limit: 1000), // Get all products for count
+      ]);
+
+      if (mounted) {
+        setState(() {
+          stats = {
+            'categories': (categoriesResponse['categories'] as List?)?.length ?? 0,
+            'products': (productsResponse['products'] as List?)?.length ?? 0,
+            'activeProducts': (productsResponse['products'] as List?)
+                ?.where((p) => p['inStock'] == true)
+                .length ?? 0,
+          };
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      print('Error loading stats: $e');
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    return Directionality(
+      textDirection: TextDirection.rtl,
+      child: Scaffold(
+        backgroundColor: Colors.grey[50],
+        appBar: AppBar(
+          title: const Text('لوحة التحكم'),
+          backgroundColor: const Color(0xFFD32F2F),
+          foregroundColor: Colors.white,
+          elevation: 0,
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.refresh),
+              onPressed: _loadStats,
+            ),
+          ],
+        ),
+        body: isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : RefreshIndicator(
+                onRefresh: _loadStats,
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Welcome Section
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          gradient: const LinearGradient(
+                            colors: [Color(0xFFD32F2F), Color(0xFFB71C1C)],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.red.withOpacity(0.3),
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: const Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'مرحباً بك في لوحة التحكم',
+                              style: TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                            SizedBox(height: 8),
+                            Text(
+                              'إدارة شاملة للمتجر الإلكتروني',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.white70,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      const SizedBox(height: 24),
+
+                      // Stats Cards
+                      Row(
+                        children: [
+                          Expanded(
+                            child: _buildStatCard(
+                              'الأقسام',
+                              '${stats['categories'] ?? 0}',
+                              Icons.category,
+                              Colors.blue,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: _buildStatCard(
+                              'المنتجات',
+                              '${stats['products'] ?? 0}',
+                              Icons.inventory_2,
+                              Colors.green,
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(height: 12),
+
+                      Row(
+                        children: [
+                          Expanded(
+                            child: _buildStatCard(
+                              'المنتجات النشطة',
+                              '${stats['activeProducts'] ?? 0}',
+                              Icons.check_circle,
+                              Colors.orange,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: _buildStatCard(
+                              'إجمالي المبيعات',
+                              '0 JOD',
+                              Icons.monetization_on,
+                              Colors.purple,
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(height: 32),
+
+                      // Quick Actions
+                      const Text(
+                        'الإجراءات السريعة',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black87,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+
+                      GridView.count(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        crossAxisCount: 2,
+                        childAspectRatio: 1.2,
+                        crossAxisSpacing: 12,
+                        mainAxisSpacing: 12,
+                        children: [
+                          _buildActionCard(
+                            'إضافة قسم جديد',
+                            Icons.add_box,
+                            Colors.blue,
+                            () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const AddCategoryPage(),
+                              ),
+                            ).then((_) => _loadStats()),
+                          ),
+                          _buildActionCard(
+                            'إضافة منتج جديد',
+                            Icons.add_shopping_cart,
+                            Colors.green,
+                            () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const AddProductPage(),
+                              ),
+                            ).then((_) => _loadStats()),
+                          ),
+                          _buildActionCard(
+                            'إدارة الأقسام',
+                            Icons.category,
+                            Colors.orange,
+                            () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const ManageCategoriesPage(),
+                              ),
+                            ).then((_) => _loadStats()),
+                          ),
+                          _buildActionCard(
+                            'إدارة المنتجات',
+                            Icons.inventory,
+                            Colors.purple,
+                            () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const ManageProductsPage(),
+                              ),
+                            ).then((_) => _loadStats()),
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(height: 32),
+
+                      // Recent Activity (Placeholder)
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.1),
+                              blurRadius: 10,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: const Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'النشاط الأخير',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black87,
+                              ),
+                            ),
+                            SizedBox(height: 16),
+                            Center(
+                              child: Column(
+                                children: [
+                                  Icon(
+                                    Icons.timeline,
+                                    size: 48,
+                                    color: Colors.grey,
+                                  ),
+                                  SizedBox(height: 8),
+                                  Text(
+                                    'لا توجد أنشطة حديثة',
+                                    style: TextStyle(
+                                      color: Colors.grey,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+      ),
+    );
+  }
+
+  Widget _buildStatCard(String title, String value, IconData icon, Color color) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: color.withOpacity(0.3),
-          width: 1,
-        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -228,102 +317,77 @@ class _StatCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Icon(
-                icon,
-                color: color,
-                size: 24,
-              ),
-              Text(
-                value,
-                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: color,
+              Icon(icon, color: color, size: 24),
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: color.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
                 ),
+                child: Icon(icon, color: color, size: 16),
               ),
             ],
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 12),
+          Text(
+            value,
+            style: const TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: Colors.black87,
+            ),
+          ),
+          const SizedBox(height: 4),
           Text(
             title,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: Colors.grey[700],
+            style: TextStyle(
+              fontSize: 14,
+              color: Colors.grey[600],
             ),
           ),
         ],
       ),
     );
   }
-}
 
-class _ManagementCard extends StatelessWidget {
-  final String title;
-  final String subtitle;
-  final IconData icon;
-  final Color color;
-  final VoidCallback onTap;
-
-  const _ManagementCard({
-    required this.title,
-    required this.subtitle,
-    required this.icon,
-    required this.color,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Row(
-            children: [
-              Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  color: color.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Icon(
-                  icon,
-                  color: color,
-                  size: 24,
-                ),
+  Widget _buildActionCard(String title, IconData icon, Color color, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.1),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: color.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(12),
               ),
-              
-              const SizedBox(width: 16),
-              
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      subtitle,
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Colors.grey[600],
-                      ),
-                    ),
-                  ],
-                ),
+              child: Icon(icon, color: color, size: 32),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              title,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: Colors.black87,
               ),
-              
-              Icon(
-                Icons.arrow_forward_ios,
-                color: Colors.grey[400],
-                size: 16,
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

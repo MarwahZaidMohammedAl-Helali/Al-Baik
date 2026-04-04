@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'services/api_service.dart';
+import 'features/admin/presentation/pages/admin_dashboard_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -261,11 +262,16 @@ class _HomeScreenState extends State<HomeScreen> {
     try {
       final apiService = ApiService();
       
+      print('🔄 Loading data from API: ${ApiService.baseUrl}');
+      
       // Load categories and products from API
       final [categoriesResponse, productsResponse] = await Future.wait([
         apiService.getCategories(),
         apiService.getProducts(limit: 10),
       ]);
+
+      print('📦 Categories response: $categoriesResponse');
+      print('🛍️ Products response: $productsResponse');
 
       if (mounted) {
         setState(() {
@@ -273,9 +279,11 @@ class _HomeScreenState extends State<HomeScreen> {
           products = List<Map<String, dynamic>>.from(productsResponse['products'] ?? []);
           isLoading = false;
         });
+        
+        print('✅ Data loaded - Categories: ${categories.length}, Products: ${products.length}');
       }
     } catch (e) {
-      print('Error loading data: $e');
+      print('❌ Error loading data: $e');
       if (mounted) {
         setState(() {
           isLoading = false;
@@ -328,25 +336,27 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       const SizedBox(height: 10),
                       
-                      GridView.builder(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 4,
-                          childAspectRatio: 0.8,
-                          crossAxisSpacing: 10,
-                          mainAxisSpacing: 10,
+                      SizedBox(
+                        height: 120, // Fixed height to prevent taking too much space
+                        child: GridView.builder(
+                          scrollDirection: Axis.horizontal,
+                          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 1,
+                            childAspectRatio: 1.2,
+                            crossAxisSpacing: 8,
+                            mainAxisSpacing: 8,
+                          ),
+                          itemCount: categories.length,
+                          itemBuilder: (context, index) {
+                            final category = categories[index];
+                            return _buildCategory(
+                              context,
+                              category['nameAr'] ?? category['name'] ?? 'قسم',
+                              category['icon'] ?? '📦',
+                              const Color(0xFFD32F2F),
+                            );
+                          },
                         ),
-                        itemCount: categories.length,
-                        itemBuilder: (context, index) {
-                          final category = categories[index];
-                          return _buildCategory(
-                            context,
-                            category['nameAr'] ?? category['name'] ?? 'قسم',
-                            category['icon'] ?? '📦',
-                            const Color(0xFFD32F2F),
-                          );
-                        },
                       ),
                       
                       const SizedBox(height: 30),
@@ -354,24 +364,26 @@ class _HomeScreenState extends State<HomeScreen> {
                       // Empty state for categories
                       Container(
                         width: double.infinity,
-                        padding: const EdgeInsets.all(32),
+                        padding: const EdgeInsets.all(16),
+                        margin: const EdgeInsets.symmetric(horizontal: 16),
                         decoration: BoxDecoration(
                           color: Colors.grey[100],
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(8),
                           border: Border.all(color: Colors.grey[300]!),
                         ),
                         child: const Column(
+                          mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(Icons.category_outlined, size: 48, color: Colors.grey),
-                            SizedBox(height: 16),
-                            Text(
-                              'لا توجد أقسام',
-                              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.grey),
-                            ),
+                            Icon(Icons.category_outlined, size: 32, color: Colors.grey),
                             SizedBox(height: 8),
                             Text(
+                              'لا توجد أقسام',
+                              style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.grey),
+                            ),
+                            SizedBox(height: 4),
+                            Text(
                               'سيتم إضافة الأقسام من قبل الإدارة',
-                              style: TextStyle(color: Colors.grey),
+                              style: TextStyle(fontSize: 12, color: Colors.grey),
                               textAlign: TextAlign.center,
                             ),
                           ],
@@ -407,24 +419,26 @@ class _HomeScreenState extends State<HomeScreen> {
                       // Empty state for products
                       Container(
                         width: double.infinity,
-                        padding: const EdgeInsets.all(32),
+                        padding: const EdgeInsets.all(16),
+                        margin: const EdgeInsets.symmetric(horizontal: 16),
                         decoration: BoxDecoration(
                           color: Colors.grey[100],
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(8),
                           border: Border.all(color: Colors.grey[300]!),
                         ),
                         child: const Column(
+                          mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(Icons.inventory_2_outlined, size: 48, color: Colors.grey),
-                            SizedBox(height: 16),
-                            Text(
-                              'لا توجد منتجات',
-                              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.grey),
-                            ),
+                            Icon(Icons.inventory_2_outlined, size: 32, color: Colors.grey),
                             SizedBox(height: 8),
                             Text(
+                              'لا توجد منتجات',
+                              style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.grey),
+                            ),
+                            SizedBox(height: 4),
+                            Text(
                               'سيتم إضافة المنتجات من قبل الإدارة',
-                              style: TextStyle(color: Colors.grey),
+                              style: TextStyle(fontSize: 12, color: Colors.grey),
                               textAlign: TextAlign.center,
                             ),
                           ],
@@ -448,31 +462,36 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         );
       },
-      child: Column(
-        children: [
-          Container(
-            width: 60,
-            height: 60,
-            decoration: BoxDecoration(
-              color: color.withOpacity(0.2),
-              borderRadius: BorderRadius.circular(30),
-            ),
-            child: Center(
-              child: Text(
-                icon,
-                style: const TextStyle(fontSize: 24),
+      child: Container(
+        width: 80,
+        padding: const EdgeInsets.all(8),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: 50,
+              height: 50,
+              decoration: BoxDecoration(
+                color: color.withOpacity(0.2),
+                borderRadius: BorderRadius.circular(25),
+              ),
+              child: Center(
+                child: Text(
+                  icon,
+                  style: const TextStyle(fontSize: 20),
+                ),
               ),
             ),
-          ),
-          const SizedBox(height: 5),
-          Text(
-            name,
-            style: const TextStyle(fontSize: 10),
-            textAlign: TextAlign.center,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ],
+            const SizedBox(height: 4),
+            Text(
+              name,
+              style: const TextStyle(fontSize: 10),
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -607,51 +626,490 @@ class AccountScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('الحساب'),
-        backgroundColor: const Color(0xFFD32F2F),
-        foregroundColor: Colors.white,
-      ),
-      body: Center(
-        child: isLoggedIn
-            ? Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text('مرحباً $userName'),
-                  Text('نوع الحساب: $userType'),
-                  const SizedBox(height: 20),
-                  if (userType == 'admin' || userType == 'staff')
-                    ElevatedButton(
-                      onPressed: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('لوحة التحكم - قريباً'),
-                            backgroundColor: Colors.grey,
+    return Directionality(
+      textDirection: TextDirection.rtl,
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('الحساب'),
+          backgroundColor: const Color(0xFFD32F2F),
+          foregroundColor: Colors.white,
+        ),
+        body: Padding(
+          padding: const EdgeInsets.all(16),
+          child: isLoggedIn
+              ? Column(
+                  children: [
+                    // User Info Card
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.1),
+                            blurRadius: 10,
+                            offset: const Offset(0, 2),
                           ),
-                        );
-                      },
-                      child: const Text('لوحة التحكم'),
+                        ],
+                      ),
+                      child: Column(
+                        children: [
+                          const CircleAvatar(
+                            radius: 40,
+                            backgroundColor: Color(0xFFD32F2F),
+                            child: Icon(Icons.person, size: 40, color: Colors.white),
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            'مرحباً $userName',
+                            style: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                            decoration: BoxDecoration(
+                              color: _getUserTypeColor(userType).withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Text(
+                              _getUserTypeText(userType),
+                              style: TextStyle(
+                                color: _getUserTypeColor(userType),
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  const SizedBox(height: 10),
-                  ElevatedButton(
-                    onPressed: onLogout,
-                    child: const Text('تسجيل الخروج'),
+
+                    const SizedBox(height: 24),
+
+                    // Admin/Staff Actions
+                    if (userType == 'admin' || userType == 'staff') ...[
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.1),
+                              blurRadius: 10,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'إدارة المتجر',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            SizedBox(
+                              width: double.infinity,
+                              child: ElevatedButton.icon(
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => const AdminDashboardPage(),
+                                    ),
+                                  );
+                                },
+                                icon: const Icon(Icons.dashboard),
+                                label: const Text('لوحة التحكم'),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color(0xFFD32F2F),
+                                  foregroundColor: Colors.white,
+                                  padding: const EdgeInsets.symmetric(vertical: 16),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                    ],
+
+                    // Account Actions
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.1),
+                            blurRadius: 10,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'إعدادات الحساب',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          _buildAccountOption(
+                            icon: Icons.person_outline,
+                            title: 'الملف الشخصي',
+                            onTap: () {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('الملف الشخصي - قريباً'),
+                                  backgroundColor: Colors.grey,
+                                ),
+                              );
+                            },
+                          ),
+                          _buildAccountOption(
+                            icon: Icons.settings_outlined,
+                            title: 'الإعدادات',
+                            onTap: () {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('الإعدادات - قريباً'),
+                                  backgroundColor: Colors.grey,
+                                ),
+                              );
+                            },
+                          ),
+                          _buildAccountOption(
+                            icon: Icons.help_outline,
+                            title: 'المساعدة',
+                            onTap: () {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('المساعدة - قريباً'),
+                                  backgroundColor: Colors.grey,
+                                ),
+                              );
+                            },
+                          ),
+                          const Divider(height: 32),
+                          SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton.icon(
+                              onPressed: onLogout,
+                              icon: const Icon(Icons.logout),
+                              label: const Text('تسجيل الخروج'),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.red[50],
+                                foregroundColor: Colors.red,
+                                padding: const EdgeInsets.symmetric(vertical: 16),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                )
+              : Center(
+                  child: Container(
+                    padding: const EdgeInsets.all(32),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.1),
+                          blurRadius: 10,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(
+                          Icons.person_outline,
+                          size: 64,
+                          color: Colors.grey,
+                        ),
+                        const SizedBox(height: 16),
+                        const Text(
+                          'مرحباً بك',
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        const Text(
+                          'سجل دخولك للوصول إلى حسابك',
+                          style: TextStyle(
+                            color: Colors.grey,
+                            fontSize: 16,
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton.icon(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => LoginScreen(onLogin: onLogin),
+                                ),
+                              );
+                            },
+                            icon: const Icon(Icons.login),
+                            label: const Text('تسجيل الدخول'),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFFD32F2F),
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ],
-              )
-            : ElevatedButton(
+                ),
+        ),
+      ),
+    );
+  }
+
+  Color _getUserTypeColor(String userType) {
+    switch (userType) {
+      case 'admin':
+        return Colors.red;
+      case 'staff':
+        return Colors.orange;
+      default:
+        return Colors.blue;
+    }
+  }
+
+  String _getUserTypeText(String userType) {
+    switch (userType) {
+      case 'admin':
+        return 'مدير';
+      case 'staff':
+        return 'موظف';
+      default:
+        return 'عميل';
+    }
+  }
+
+  Widget _buildAccountOption({
+    required IconData icon,
+    required String title,
+    required VoidCallback onTap,
+  }) {
+    return ListTile(
+      leading: Icon(icon, color: Colors.grey[600]),
+      title: Text(title),
+      trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+      onTap: onTap,
+      contentPadding: EdgeInsets.zero,
+    );
+  }
+}
+
+class LoginScreen extends StatefulWidget {
+  final Function(String, String) onLogin;
+
+  const LoginScreen({super.key, required this.onLogin});
+
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
+  bool isLoading = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Directionality(
+      textDirection: TextDirection.rtl,
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('تسجيل الدخول'),
+          backgroundColor: const Color(0xFFD32F2F),
+          foregroundColor: Colors.white,
+        ),
+        body: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // Logo
+              Container(
+                width: 100,
+                height: 100,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFD32F2F),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: const Center(
+                  child: Text(
+                    'AB',
+                    style: TextStyle(
+                      fontSize: 36,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 32),
+              
+              // Welcome text
+              const Text(
+                'مرحباً بك',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                'سجل دخولك للوصول إلى حسابك',
+                style: TextStyle(
+                  color: Colors.grey,
+                  fontSize: 16,
+                ),
+              ),
+              const SizedBox(height: 32),
+              
+              // Username field
+              TextField(
+                controller: emailController,
+                textAlign: TextAlign.right,
+                decoration: const InputDecoration(
+                  labelText: 'اسم المستخدم',
+                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.person),
+                ),
+              ),
+              const SizedBox(height: 16),
+              
+              // Password field
+              TextField(
+                controller: passwordController,
+                textAlign: TextAlign.right,
+                obscureText: true,
+                decoration: const InputDecoration(
+                  labelText: 'كلمة المرور',
+                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.lock),
+                ),
+              ),
+              const SizedBox(height: 24),
+              
+              // Login button
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: isLoading
+                      ? null
+                      : () async {
+                          setState(() => isLoading = true);
+                          try {
+                            await widget.onLogin(emailController.text, passwordController.text);
+                            if (context.mounted) {
+                              Navigator.pop(context);
+                            }
+                          } catch (e) {
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('خطأ في تسجيل الدخول: $e'),
+                                  backgroundColor: Colors.red,
+                                ),
+                              );
+                            }
+                          } finally {
+                            if (mounted) {
+                              setState(() => isLoading = false);
+                            }
+                          }
+                        },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFD32F2F),
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: isLoading
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                          ),
+                        )
+                      : const Text(
+                          'تسجيل الدخول',
+                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                        ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              
+              // Register link
+              TextButton(
                 onPressed: () {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
-                      content: Text('صفحة تسجيل الدخول - قريباً'),
+                      content: Text('التسجيل - قريباً'),
                       backgroundColor: Colors.grey,
                     ),
                   );
                 },
-                child: const Text('تسجيل الدخول'),
+                child: const Text(
+                  'ليس لديك حساب؟ سجل الآن',
+                  style: TextStyle(color: Color(0xFFD32F2F)),
+                ),
               ),
+            ],
+          ),
+        ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    emailController.dispose();
+    passwordController.dispose();
+    super.dispose();
   }
 }

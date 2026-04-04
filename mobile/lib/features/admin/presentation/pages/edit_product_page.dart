@@ -1,33 +1,69 @@
 import 'package:flutter/material.dart';
 import '../../../../services/api_service.dart';
 
-class AddProductPage extends StatefulWidget {
-  const AddProductPage({super.key});
+class EditProductPage extends StatefulWidget {
+  final Map<String, dynamic> product;
+
+  const EditProductPage({super.key, required this.product});
 
   @override
-  State<AddProductPage> createState() => _AddProductPageState();
+  State<EditProductPage> createState() => _EditProductPageState();
 }
 
-class _AddProductPageState extends State<AddProductPage> {
+class _EditProductPageState extends State<EditProductPage> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _descriptionController = TextEditingController();
   final _priceController = TextEditingController();
   final _skuController = TextEditingController();
   final _stockController = TextEditingController();
-  final _imageUrlController = TextEditingController();
-  final _videoUrlController = TextEditingController();
   final _tagsController = TextEditingController();
+  final _imageUrlController = TextEditingController();
   
+  String _selectedCategoryId = '';
   String _selectedCurrency = 'JOD';
-  String? _selectedCategoryId;
-  List<Map<String, dynamic>> _categories = [];
+  bool _inStock = true;
   bool _isLoading = false;
+  
+  List<Map<String, dynamic>> _categories = [];
 
   @override
   void initState() {
     super.initState();
+    _initializeForm();
     _loadCategories();
+  }
+
+  void _initializeForm() {
+    _nameController.text = widget.product['nameAr'] ?? widget.product['name'] ?? '';
+    _descriptionController.text = widget.product['descriptionAr'] ?? widget.product['description'] ?? '';
+    _priceController.text = (widget.product['price'] ?? 0).toString();
+    _skuController.text = widget.product['sku'] ?? '';
+    _stockController.text = (widget.product['stockQuantity'] ?? 0).toString();
+    _imageUrlController.text = widget.product['mainImage'] ?? '';
+    _selectedCategoryId = widget.product['categoryId'] ?? '';
+    _selectedCurrency = widget.product['currency'] ?? 'JOD';
+    _inStock = widget.product['inStock'] ?? true;
+    
+    // Handle tags
+    if (widget.product['tags'] != null && widget.product['tags'] is List) {
+      _tagsController.text = (widget.product['tags'] as List).join(', ');
+    }
+  }
+
+  Future<void> _loadCategories() async {
+    try {
+      final apiService = ApiService();
+      final response = await apiService.getCategories();
+      
+      if (mounted) {
+        setState(() {
+          _categories = List<Map<String, dynamic>>.from(response['categories'] ?? []);
+        });
+      }
+    } catch (e) {
+      print('Error loading categories: $e');
+    }
   }
 
   @override
@@ -37,49 +73,15 @@ class _AddProductPageState extends State<AddProductPage> {
     _priceController.dispose();
     _skuController.dispose();
     _stockController.dispose();
-    _imageUrlController.dispose();
-    _videoUrlController.dispose();
     _tagsController.dispose();
+    _imageUrlController.dispose();
     super.dispose();
   }
 
-  Future<void> _loadCategories() async {
-    try {
-      final apiService = ApiService();
-      final response = await apiService.getCategories();
-      setState(() {
-        _categories = List<Map<String, dynamic>>.from(response['categories'] ?? []);
-      });
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('خطأ في تحميل الأقسام: $e'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
-    }
-  }
+  Future<void> _updateProduct() async {
+    if (!_formKey.currentState!.validate()) return;
 
-  Future<void> _saveProduct() async {
-    if (!_formKey.currentState!.validate()) {
-      return;
-    }
-
-    if (_selectedCategoryId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('يرجى اختيار القسم'),
-          backgroundColor: Colors.red,
-        ),
-      );
-      return;
-    }
-
-    setState(() {
-      _isLoading = true;
-    });
+    setState(() => _isLoading = true);
 
     try {
       final apiService = ApiService();
@@ -87,49 +89,47 @@ class _AddProductPageState extends State<AddProductPage> {
       final productData = {
         'name': _nameController.text.trim(),
         'nameAr': _nameController.text.trim(),
-        'description': _descriptionController.text.trim().isEmpty ? null : _descriptionController.text.trim(),
-        'descriptionAr': _descriptionController.text.trim().isEmpty ? null : _descriptionController.text.trim(),
-        'price': double.parse(_priceController.text),
+        'description': _descriptionController.text.trim().isEmpty 
+            ? null 
+            : _descriptionController.text.trim(),
+        'descriptionAr': _descriptionController.text.trim().isEmpty 
+            ? null 
+            : _descriptionController.text.trim(),
+        'price': double.tryParse(_priceController.text) ?? 0,
         'currency': _selectedCurrency,
         'sku': _skuController.text.trim().isEmpty ? null : _skuController.text.trim(),
         'categoryId': _selectedCategoryId,
         'mainImage': _imageUrlController.text.trim().isEmpty ? null : _imageUrlController.text.trim(),
-        'images': _imageUrlController.text.trim().isEmpty ? [] : [_imageUrlController.text.trim()],
-        'videoUrl': _videoUrlController.text.trim().isEmpty ? null : _videoUrlController.text.trim(),
-        'stockQuantity': int.parse(_stockController.text),
-        'inStock': true,
+        'stockQuantity': int.tryParse(_stockController.text) ?? 0,
+        'inStock': _inStock,
         'tags': _tagsController.text.trim().isEmpty 
             ? [] 
             : _tagsController.text.split(',').map((tag) => tag.trim()).where((tag) => tag.isNotEmpty).toList(),
-        'specifications': {},
       };
 
-      await apiService.createProduct(productData);
+      await apiService.updateProduct(widget.product['id'], productData);
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('تم إنشاء المنتج بنجاح'),
+            content: Text('تم تحديث المنتج بنجاح'),
             backgroundColor: Colors.green,
           ),
         );
-        
         Navigator.pop(context);
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('خطأ في إنشاء المنتج: $e'),
+            content: Text('خطأ في تحديث المنتج: $e'),
             backgroundColor: Colors.red,
           ),
         );
       }
     } finally {
       if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
+        setState(() => _isLoading = false);
       }
     }
   }
@@ -141,7 +141,7 @@ class _AddProductPageState extends State<AddProductPage> {
       child: Scaffold(
         backgroundColor: Colors.grey[50],
         appBar: AppBar(
-          title: const Text('إضافة منتج جديد'),
+          title: const Text('تعديل المنتج'),
           backgroundColor: const Color(0xFFD32F2F),
           foregroundColor: Colors.white,
           elevation: 0,
@@ -168,28 +168,47 @@ class _AddProductPageState extends State<AddProductPage> {
                       ),
                     ],
                   ),
-                  child: const Column(
+                  child: Column(
                     children: [
-                      Icon(
-                        Icons.add_shopping_cart,
-                        size: 64,
-                        color: Color(0xFFD32F2F),
+                      Container(
+                        width: 80,
+                        height: 80,
+                        decoration: BoxDecoration(
+                          color: Colors.grey[100],
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(12),
+                          child: widget.product['mainImage'] != null
+                              ? Image.network(
+                                  widget.product['mainImage'],
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return const Center(
+                                      child: Icon(Icons.inventory_2, size: 32, color: Colors.grey),
+                                    );
+                                  },
+                                )
+                              : const Center(
+                                  child: Icon(Icons.inventory_2, size: 32, color: Colors.grey),
+                                ),
+                        ),
                       ),
-                      SizedBox(height: 16),
-                      Text(
-                        'إضافة منتج جديد',
+                      const SizedBox(height: 16),
+                      const Text(
+                        'تعديل بيانات المنتج',
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
                           color: Colors.black87,
                         ),
                       ),
-                      SizedBox(height: 8),
+                      const SizedBox(height: 8),
                       Text(
-                        'أضف منتجاً جديداً إلى متجرك',
+                        'ID: ${widget.product['id']}',
                         style: TextStyle(
                           fontSize: 14,
-                          color: Colors.grey,
+                          color: Colors.grey[600],
                         ),
                       ),
                     ],
@@ -223,14 +242,14 @@ class _AddProductPageState extends State<AddProductPage> {
                     const SizedBox(height: 16),
                     _buildDropdown(
                       label: 'القسم *',
-                      value: _selectedCategoryId,
+                      value: _selectedCategoryId.isEmpty ? null : _selectedCategoryId,
                       items: _categories.map((category) => DropdownMenuItem<String>(
                         value: category['id'],
                         child: Text(category['nameAr'] ?? category['name'] ?? 'قسم'),
                       )).toList(),
-                      onChanged: (value) => setState(() => _selectedCategoryId = value),
+                      onChanged: (value) => setState(() => _selectedCategoryId = value ?? ''),
                       validator: (value) {
-                        if (value == null) {
+                        if (value == null || value.isEmpty) {
                           return 'يرجى اختيار القسم';
                         }
                         return null;
@@ -310,25 +329,45 @@ class _AddProductPageState extends State<AddProductPage> {
                         ),
                       ],
                     ),
+                    const SizedBox(height: 16),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          'حالة التوفر',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black87,
+                          ),
+                        ),
+                        Switch(
+                          value: _inStock,
+                          onChanged: (value) => setState(() => _inStock = value),
+                          activeColor: const Color(0xFFD32F2F),
+                        ),
+                      ],
+                    ),
+                    Text(
+                      _inStock ? 'المنتج متوفر للبيع' : 'المنتج غير متوفر',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey[600],
+                      ),
+                    ),
                   ],
                 ),
 
                 const SizedBox(height: 24),
 
-                // Media & Additional Info
+                // Additional Info
                 _buildSection(
-                  'الوسائط والمعلومات الإضافية',
+                  'معلومات إضافية',
                   [
                     _buildTextField(
                       controller: _imageUrlController,
                       label: 'رابط الصورة الرئيسية',
                       hint: 'https://example.com/image.jpg',
-                    ),
-                    const SizedBox(height: 16),
-                    _buildTextField(
-                      controller: _videoUrlController,
-                      label: 'رابط الفيديو',
-                      hint: 'https://example.com/video.mp4',
                     ),
                     const SizedBox(height: 16),
                     _buildTextField(
@@ -341,11 +380,11 @@ class _AddProductPageState extends State<AddProductPage> {
 
                 const SizedBox(height: 32),
 
-                // Save Button
+                // Update Button
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                    onPressed: _isLoading ? null : _saveProduct,
+                    onPressed: _isLoading ? null : _updateProduct,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFFD32F2F),
                       foregroundColor: Colors.white,
@@ -365,7 +404,7 @@ class _AddProductPageState extends State<AddProductPage> {
                             ),
                           )
                         : const Text(
-                            'إنشاء المنتج',
+                            'تحديث المنتج',
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,

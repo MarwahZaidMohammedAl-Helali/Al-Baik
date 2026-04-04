@@ -183,10 +183,10 @@ export default function LoginPage() {
               fontWeight: '500',
               color: 'var(--text-dark)'
             }}>
-              البريد الإلكتروني
+              اسم المستخدم
             </label>
             <input
-              type="email"
+              type="text"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required

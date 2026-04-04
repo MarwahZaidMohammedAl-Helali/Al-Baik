@@ -24,31 +24,4 @@ flutter:
   uses-material-design: true
   
   assets:
-    - assets/Product1/
-    - assets/Product1/Main Photo.png
-    - assets/Product1/Another photo.png
-    - assets/Product1/product1 Video.mp4
-    - assets/Product2/
-    - assets/Product2/Main Photo.png
-    - assets/Product2/Another photo 1.png
-    - assets/Product2/Another photo 2.png
-    - assets/Product2/product2 Video.mp4
-    - assets/Product3/
-    - assets/Product3/Main Photo.jpeg
-    - assets/Product3/Another photo.png
-    - assets/Product3/product3 Video.mp4
-    - assets/Product4/
-    - assets/Product4/Main Photo.jpeg
-    - assets/Product4/Another photo.jpg
-    - assets/Product4/product4 Video.mp4
-    - assets/Product5/
-    - assets/Product5/Main Photo.png
-    - assets/Product5/Another photo.png
-    - assets/Product5/product5 Video.mp4
-    - assets/Product6/
-    - assets/Product6/Main Photo.jpeg
-    - assets/Product6/product6 Video.mp4
-    - assets/icons/
-    - assets/fonts/
-    - assets/logo.png
-    - assets/App Photo.jpeg
+    - assets/

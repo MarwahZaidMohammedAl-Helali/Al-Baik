@@ -125,7 +125,7 @@ async function insertDefaultData(env) {
   if (usersCount.count === 0) {
     await env.DB.batch([
       env.DB.prepare(`INSERT INTO users (id, email, password, firstName, lastName, role, isActive) VALUES (?, ?, ?, ?, ?, ?, ?)`).bind(
-        'admin-1', 'admin@al-baik.com', 'admin123', 'المدير', 'العام', 'admin', 1
+        'admin-1', 'admin', '1234', 'المدير', 'العام', 'admin', 1
       ),
       env.DB.prepare(`INSERT INTO users (id, email, password, firstName, lastName, role, isActive) VALUES (?, ?, ?, ?, ?, ?, ?)`).bind(
         'staff-1', 'staff@al-baik.com', 'staff123', 'الموظف', 'الأول', 'staff', 1
@@ -138,7 +138,7 @@ async function insertDefaultData(env) {
 }
 // Enable CORS
 app.use('*', cors({
-  origin: ['http://localhost:3000', 'https://al-baik.com', '*'],
+  origin: ['http://localhost:3000', 'http://localhost:3001', 'https://al-baik-dx8k.vercel.app', '*'],
   allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowHeaders: ['Content-Type', 'Authorization'],
 }));

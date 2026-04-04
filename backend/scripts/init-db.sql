@@ -102,7 +102,7 @@ INSERT INTO products (
 
 -- Insert Demo Users
 INSERT INTO users (id, email, password, first_name, last_name, role, is_active, email_verified) VALUES
-('user_admin', 'admin@al-baik.com', 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855', 'المدير', 'العام', 'admin', 1, 1),
+('user_admin', 'admin', '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', 'المدير', 'العام', 'admin', 1, 1),
 ('user_staff', 'staff@al-baik.com', 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855', 'الموظف', 'الأول', 'staff', 1, 1),
 ('user_customer', 'customer@al-baik.com', 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855', 'العميل', 'المميز', 'customer', 1, 1);
 

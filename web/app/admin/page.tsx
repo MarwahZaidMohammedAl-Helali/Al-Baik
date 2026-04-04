@@ -319,10 +319,10 @@ export default function AdminPage() {
                 fontWeight: '500',
                 color: '#374151'
               }}>
-                البريد الإلكتروني
+                اسم المستخدم
               </label>
               <input
-                type="email"
+                type="text"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -825,8 +825,10 @@ export default function AdminPage() {
             ) : (
               <div style={{
                 display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-                gap: '1.5rem'
+                gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+                gap: '1rem',
+                maxHeight: '300px',
+                overflowY: 'auto'
               }}>
                 {categories.map(category => (
                   <div
@@ -834,13 +836,17 @@ export default function AdminPage() {
                     onClick={() => setSelectedCategory(category.nameAr || category.name)}
                     style={{
                       backgroundColor: 'white',
-                      padding: '2rem',
-                      borderRadius: '12px',
+                      padding: '1rem',
+                      borderRadius: '8px',
                       boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
                       border: '1px solid #e2e8f0',
                       cursor: 'pointer',
                       transition: 'all 0.2s',
-                      textAlign: 'center'
+                      textAlign: 'center',
+                      minHeight: '120px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      justifyContent: 'center'
                     }}
                     onMouseEnter={(e) => {
                       e.currentTarget.style.transform = 'translateY(-2px)'

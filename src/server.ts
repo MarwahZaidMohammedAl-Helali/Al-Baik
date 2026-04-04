@@ -151,6 +151,7 @@ import { orderRoutes } from './routes/orderRoutes';
 import { notificationRoutes } from './routes/notificationRoutes';
 import { transactionRoutes } from './routes/transactionRoutes';
 import { auditRoutes } from './routes/auditRoutes';
+import { adminRoutes } from './routes/adminRoutes';
 
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
@@ -163,6 +164,7 @@ app.use('/api/orders', orderRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/transactions', transactionRoutes);
 app.use('/api/audit', auditRoutes);
+app.use('/api/admin', adminRoutes);
 
 // Error handling middleware (must be last)
 app.use(notFoundHandler);

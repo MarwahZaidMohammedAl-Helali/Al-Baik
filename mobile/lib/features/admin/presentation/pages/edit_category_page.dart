@@ -1,38 +1,39 @@
 import 'package:flutter/material.dart';
 import '../../../../services/api_service.dart';
 
-class AddCategoryPage extends StatefulWidget {
-  const AddCategoryPage({super.key});
+class EditCategoryPage extends StatefulWidget {
+  final Map<String, dynamic> category;
+
+  const EditCategoryPage({super.key, required this.category});
 
   @override
-  State<AddCategoryPage> createState() => _AddCategoryPageState();
+  State<EditCategoryPage> createState() => _EditCategoryPageState();
 }
 
-class _AddCategoryPageState extends State<AddCategoryPage> {
+class _EditCategoryPageState extends State<EditCategoryPage> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _descriptionController = TextEditingController();
-  
-  String _selectedIcon = '📱';
-  String _selectedColor = '#D32F2F';
+  String _selectedIcon = '📦';
+  bool _isActive = true;
   bool _isLoading = false;
 
   // Business-relevant icons
-  final List<String> _recommendedIcons = [
+  final List<String> _businessIcons = [
     '📱', '💻', '⚡', '🔌', '📺', '🎧', '⌚', '📷', '🖨️', '💡',
     '🔋', '🖱️', '⌨️', '💾', '📀', '🎮', '🔊', '📻', '📞', '🖥️',
     '🏠', '🛋️', '🍽️', '🛏️', '🚿', '🧴', '👕', '👔', '👗', '👠',
     '⚽', '🏀', '🎾', '🏓', '🎯', '🎪', '🎨', '📚', '✏️', '📝'
   ];
 
-  final List<Map<String, String>> _colors = [
-    {'name': 'أحمر', 'value': '#D32F2F'},
-    {'name': 'أزرق', 'value': '#1976D2'},
-    {'name': 'أخضر', 'value': '#388E3C'},
-    {'name': 'برتقالي', 'value': '#F57C00'},
-    {'name': 'بنفسجي', 'value': '#7B1FA2'},
-    {'name': 'تركوازي', 'value': '#00796B'},
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _nameController.text = widget.category['nameAr'] ?? widget.category['name'] ?? '';
+    _descriptionController.text = widget.category['description'] ?? '';
+    _selectedIcon = widget.category['icon'] ?? '📦';
+    _isActive = widget.category['isActive'] ?? true;
+  }
 
   @override
   void dispose() {
@@ -41,14 +42,10 @@ class _AddCategoryPageState extends State<AddCategoryPage> {
     super.dispose();
   }
 
-  Future<void> _saveCategory() async {
-    if (!_formKey.currentState!.validate()) {
-      return;
-    }
+  Future<void> _updateCategory() async {
+    if (!_formKey.currentState!.validate()) return;
 
-    setState(() {
-      _isLoading = true;
-    });
+    setState(() => _isLoading = true);
 
     try {
       final apiService = ApiService();
@@ -56,39 +53,36 @@ class _AddCategoryPageState extends State<AddCategoryPage> {
       final categoryData = {
         'name': _nameController.text.trim(),
         'nameAr': _nameController.text.trim(),
-        'description': _descriptionController.text.trim().isEmpty ? null : _descriptionController.text.trim(),
+        'description': _descriptionController.text.trim().isEmpty 
+            ? null 
+            : _descriptionController.text.trim(),
         'icon': _selectedIcon,
-        'color': _selectedColor,
-        'sortOrder': 0,
-        'isActive': true,
+        'isActive': _isActive,
       };
 
-      await apiService.createCategory(categoryData);
+      await apiService.updateCategory(widget.category['id'], categoryData);
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('تم إنشاء القسم بنجاح'),
+            content: Text('تم تحديث القسم بنجاح'),
             backgroundColor: Colors.green,
           ),
         );
-        
         Navigator.pop(context);
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('خطأ في إنشاء القسم: $e'),
+            content: Text('خطأ في تحديث القسم: $e'),
             backgroundColor: Colors.red,
           ),
         );
       }
     } finally {
       if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
+        setState(() => _isLoading = false);
       }
     }
   }
@@ -100,7 +94,7 @@ class _AddCategoryPageState extends State<AddCategoryPage> {
       child: Scaffold(
         backgroundColor: Colors.grey[50],
         appBar: AppBar(
-          title: const Text('إضافة قسم جديد'),
+          title: const Text('تعديل القسم'),
           backgroundColor: const Color(0xFFD32F2F),
           foregroundColor: Colors.white,
           elevation: 0,
@@ -133,7 +127,7 @@ class _AddCategoryPageState extends State<AddCategoryPage> {
                         width: 80,
                         height: 80,
                         decoration: BoxDecoration(
-                          color: Color(int.parse(_selectedColor.substring(1), radix: 16) + 0xFF000000).withOpacity(0.1),
+                          color: const Color(0xFFD32F2F).withOpacity(0.1),
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Center(
@@ -145,7 +139,7 @@ class _AddCategoryPageState extends State<AddCategoryPage> {
                       ),
                       const SizedBox(height: 16),
                       const Text(
-                        'إنشاء قسم جديد',
+                        'تعديل بيانات القسم',
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
@@ -153,11 +147,11 @@ class _AddCategoryPageState extends State<AddCategoryPage> {
                         ),
                       ),
                       const SizedBox(height: 8),
-                      const Text(
-                        'أضف قسماً جديداً لتنظيم منتجاتك',
+                      Text(
+                        'ID: ${widget.category['id']}',
                         style: TextStyle(
                           fontSize: 14,
-                          color: Colors.grey,
+                          color: Colors.grey[600],
                         ),
                       ),
                     ],
@@ -183,16 +177,6 @@ class _AddCategoryPageState extends State<AddCategoryPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        'المعلومات الأساسية',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black87,
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-
                       // Category Name
                       const Text(
                         'اسم القسم *',
@@ -255,6 +239,35 @@ class _AddCategoryPageState extends State<AddCategoryPage> {
                           contentPadding: const EdgeInsets.all(16),
                         ),
                       ),
+
+                      const SizedBox(height: 20),
+
+                      // Active Status
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            'حالة القسم',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.black87,
+                            ),
+                          ),
+                          Switch(
+                            value: _isActive,
+                            onChanged: (value) => setState(() => _isActive = value),
+                            activeColor: const Color(0xFFD32F2F),
+                          ),
+                        ],
+                      ),
+                      Text(
+                        _isActive ? 'القسم نشط ومرئي للعملاء' : 'القسم غير نشط ومخفي',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey[600],
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -281,8 +294,8 @@ class _AddCategoryPageState extends State<AddCategoryPage> {
                       const Text(
                         'أيقونة القسم',
                         style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
                           color: Colors.black87,
                         ),
                       ),
@@ -296,9 +309,9 @@ class _AddCategoryPageState extends State<AddCategoryPage> {
                           crossAxisSpacing: 8,
                           mainAxisSpacing: 8,
                         ),
-                        itemCount: _recommendedIcons.length,
+                        itemCount: _businessIcons.length,
                         itemBuilder: (context, index) {
-                          final icon = _recommendedIcons[index];
+                          final icon = _businessIcons[index];
                           final isSelected = icon == _selectedIcon;
                           
                           return GestureDetector(
@@ -330,75 +343,13 @@ class _AddCategoryPageState extends State<AddCategoryPage> {
                   ),
                 ),
 
-                const SizedBox(height: 24),
-
-                // Color Selection
-                Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(16),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.1),
-                        blurRadius: 10,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'لون القسم',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black87,
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: _colors.map((colorData) {
-                          final color = Color(int.parse(colorData['value']!.substring(1), radix: 16) + 0xFF000000);
-                          final isSelected = colorData['value'] == _selectedColor;
-                          
-                          return GestureDetector(
-                            onTap: () => setState(() => _selectedColor = colorData['value']!),
-                            child: Container(
-                              width: 40,
-                              height: 40,
-                              decoration: BoxDecoration(
-                                color: color,
-                                borderRadius: BorderRadius.circular(20),
-                                border: Border.all(
-                                  color: isSelected ? Colors.black : Colors.transparent,
-                                  width: 3,
-                                ),
-                              ),
-                              child: isSelected
-                                  ? const Icon(
-                                      Icons.check,
-                                      color: Colors.white,
-                                      size: 20,
-                                    )
-                                  : null,
-                            ),
-                          );
-                        }).toList(),
-                      ),
-                    ],
-                  ),
-                ),
-
                 const SizedBox(height: 32),
 
-                // Save Button
+                // Update Button
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                    onPressed: _isLoading ? null : _saveCategory,
+                    onPressed: _isLoading ? null : _updateCategory,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFFD32F2F),
                       foregroundColor: Colors.white,
@@ -418,7 +369,7 @@ class _AddCategoryPageState extends State<AddCategoryPage> {
                             ),
                           )
                         : const Text(
-                            'إنشاء القسم',
+                            'تحديث القسم',
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
