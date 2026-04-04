@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { api } from '@/lib/api'
 
 // Products Tab Component
@@ -325,7 +325,7 @@ export function AnalyticsTab() {
     }
   }
 
-  useState(() => {
+  useEffect(() => {
     loadAnalytics()
   }, [period])
 
